@@ -16,9 +16,11 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.learning.journalApp.apiResponse.WeatherResponse;
 import com.learning.journalApp.entity.User;
 import com.learning.journalApp.repository.UserRepository;
 import com.learning.journalApp.service.UserService;
+import com.learning.journalApp.service.WeatherService;
 
 @RestController
 @RequestMapping("/user")
@@ -30,6 +32,8 @@ public class UserController {
 	@Autowired
 	private UserRepository userRepository;
 	
+	@Autowired
+	private WeatherService weatherService;
 
 	@PutMapping
 	public ResponseEntity<?> updateUser(@RequestBody User user){
@@ -49,6 +53,17 @@ public class UserController {
 		return new ResponseEntity<>(HttpStatus.NO_CONTENT);
 	}
 	
+	
+	@GetMapping
+	public ResponseEntity<?> greeting(){
+		Authentication authentication=SecurityContextHolder.getContext().getAuthentication();
+		WeatherResponse weatherResponse=weatherService.getWeather("Mumbai");
+		String greeting="";
+		if(weatherResponse!=null) {
+			greeting="Weather feels like "+weatherResponse.getCurrent().getFeelsLike();
+		}
+		return new ResponseEntity<>("Hi " +authentication.getName()+" "+ greeting,HttpStatus.OK);
+	}
 	
 	
 }
